@@ -1,4 +1,4 @@
-# ALL THIS  COMMETED OUT but still valid code if you want to use it to deploy a webapp with terraform
+# ALL THIS  COMMETED OUT but still valid code if you want to use it to deploy a webservice with terraform
 
 
 # locals {
@@ -17,7 +17,7 @@
 #   name = module.eks.cluster_name
 # }
 
-# resource "kubernetes_manifest" "webapp" {
+# resource "kubernetes_manifest" "webservice" {
 #   for_each = {
 #     for file in local.manifest_files : file => yamldecode(file("${path.module}../k8s/${file}"))
 #   }
@@ -25,13 +25,13 @@
 # }
 
   
-# data "kubernetes_service" "webapp_service" {
+# data "kubernetes_service" "webservice_service" {
 #   metadata {
-#     name      = "webapp-svc"
-#     namespace = "webapp"
+#     name      = "webservice-svc"
+#     namespace = "webservice"
 #   }
 # }
 
 # output "external_ip" {
-#   value = data.kubernetes_service.webapp_service.status[0].load_balancer[0].ingress[0].hostname
+#   value = data.kubernetes_service.webservice_service.status[0].load_balancer[0].ingress[0].hostname
 # }
