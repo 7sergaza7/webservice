@@ -1,4 +1,4 @@
-name: template-webapp
+name: _webvservice
 on:
   workflow_call:
     secrets:
@@ -12,8 +12,8 @@ on:
         required: true
 
 jobs:
-  build-webapp:
-    name: Build and Push Webapp Docker Image to ECR
+  build-webservice:
+    name: Build and Push docker Image to ECR
     runs-on: ubuntu-latest
 
     steps:
@@ -56,12 +56,10 @@ jobs:
 
     
     - name: Build Docker Image
-      run: |
-        # docker build -t webapp ./webapp
-        # docker tag webapp:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest
-        docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest ./webapp
+      run: |        
+        docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common-app:0.1.0 ./webservice
     
     - name: Push Docker Image to AWS ECR
       if: github.ref == 'refs/heads/main'
       run: |
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common-app:0.1.0
