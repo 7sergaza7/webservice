@@ -1,0 +1,29 @@
+name: full-cicd-webapp
+on:
+  workflow_dispatch:
+
+jobs:
+  webapp:
+    uses: 7sergaza7/microservice/.github/workflows/_webapp.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+ 
+  eks:
+    needs: webapp
+    uses: 7sergaza7/microservice/.github/workflows/_eks.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  k8s:
+    needs: eks
+    uses: 7sergaza7/microservice/.github/workflows/_k8s.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}

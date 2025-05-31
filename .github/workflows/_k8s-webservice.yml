@@ -1,0 +1,77 @@
+name: _eks-webservice
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true        
+      AWS_SECRET_ACCESS_KEY:
+        required: true        
+      AWS_REGION:
+        required: true        
+      AWS_ACCOUNT_ID:
+        required: true
+
+jobs:
+  deploy:
+    name: eks apply webservice
+    runs-on: ubuntu-latest
+    env:
+      CLUSTER_NAME: eks-task
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name $CLUSTER_NAME
+
+      - name: Deploy Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/
+          kubectl get all -n webservice
+
+    # - name: Set image variable
+    #   id: vars
+    #   run: echo "IMAGE=my-registry/my-app:${{ github.sha }}" >> $GITHUB_ENV
+
+    # - name: Substitute image in manifest
+    #   run: |
+    #     sed "s|{{IMAGE}}|${IMAGE}|g" deploy.yaml > deploy-rendered.yaml
+
+      - name: Get External IP and curl it
+        run: |
+          echo "Trying to get service external IP and curl"
+
+          for i in {1..5}; do
+            echo "Attempt $i..."
+
+            EXTERNAL_IP=$(kubectl get svc webservice-svc -n webservice -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null)
+            if [[ -z "$EXTERNAL_IP" ]]; then
+              EXTERNAL_IP=$(kubectl get svc webservice-svc -n webservice -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+            fi
+
+            if [[ -n "$EXTERNAL_IP" ]]; then
+              echo "External IP found: $EXTERNAL_IP"
+              if curl -sSf http://$EXTERNAL_IP; then
+                echo "Service is healthy!"
+                exit 0
+              else
+                echo "Health check failed."
+              fi
+            else
+              echo "External IP not yet assigned."
+            fi
+
+            sleep 15
+          done
+
+          echo "Service is not healthy or external IP not available after 5 attempts."
+          exit 1
