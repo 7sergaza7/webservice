@@ -13,13 +13,13 @@ on:
       - main
     paths:
       - 'infra/**'
-      - '.github/workflows/_eks.yml'
+      - '.github/workflows/_infra-eks.yml'
       - '.github/workflows/infra-eks.yml'
   workflow_dispatch:
 
 jobs:
   eks-cluster:    
-    uses: 7sergaza7/webservice/.github/workflows/_eks.yml@main
+    uses: 7sergaza7/webservice/.github/workflows/_infra-eks.yml@main
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
