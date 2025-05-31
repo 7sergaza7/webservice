@@ -1,0 +1,27 @@
+name: infra-provisioning-eks
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'infra/**'
+  #     - '.github/workflows/_eks.yml'
+  #     - '.github/workflows/infra-eks.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - '.github/workflows/_eks.yml'
+      - '.github/workflows/infra-eks.yml'
+  workflow_dispatch:
+
+jobs:
+  eks-cluster:    
+    uses: 7sergaza7/webservice/.github/workflows/_eks.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}

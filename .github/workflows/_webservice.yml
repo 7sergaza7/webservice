@@ -1,0 +1,67 @@
+name: template-webapp
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true        
+      AWS_SECRET_ACCESS_KEY:
+        required: true        
+      AWS_REGION:
+        required: true        
+      AWS_ACCOUNT_ID:
+        required: true
+
+jobs:
+  build-webapp:
+    name: Build and Push Webapp Docker Image to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4.1.0
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+      with:
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # - name: Extract metadata for Docker
+    #   id: meta
+    #   uses: docker/metadata-action@v5
+    #   env:
+    #     ECR_REPOSITORY: common/webapp
+    #   with:
+    #     images: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+    #     tags: |
+    #       type=semver,pattern={{version}}
+    #       type=semver,pattern={{major}}.{{minor}}
+    #       type=semver,pattern={{major}}
+    #       type=sha
+
+    # - name: Build and push Docker image
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: webapp
+    #     push: true
+    #     tags: ${{ steps.meta.outputs.tags }}
+    #     labels: ${{ steps.meta.outputs.labels }}
+
+    
+    - name: Build Docker Image
+      run: |
+        # docker build -t webapp ./webapp
+        # docker tag webapp:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest
+        docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest ./webapp
+    
+    - name: Push Docker Image to AWS ECR
+      if: github.ref == 'refs/heads/main'
+      run: |
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/common/webapp:latest

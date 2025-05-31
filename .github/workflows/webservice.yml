@@ -1,0 +1,28 @@
+name: webapp image - build and push
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+    # branches:
+    #   - main
+    # paths:
+    #   - 'webapp/**'
+    #   - '.github/workflows/_webapp.yml'
+    #   - '.github/workflows/webapp.yml'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'webapp/**'
+  #     - '.github/workflows/_webapp.yml'
+  #     - '.github/workflows/webapp.yml'
+  workflow_dispatch:
+jobs:
+  webapp:
+    uses: 7sergaza7/microservice/.github/workflows/_webapp.yml@main
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      

@@ -1,0 +1,49 @@
+
+name: infra-eks
+on:
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true        
+      AWS_SECRET_ACCESS_KEY:
+        required: true        
+      AWS_REGION:
+        required: true        
+      AWS_ACCOUNT_ID:
+        required: true
+jobs:
+  terraform:
+    name: create eks cluster
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="dev.tfvars"
+
+      #for the future implemenetation not to apply as part of pr
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -var-file="dev.tfvars" -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
