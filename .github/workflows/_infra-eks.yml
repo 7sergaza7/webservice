@@ -1,5 +1,5 @@
 
-name: infra-eks
+name: _infra-eks
 on:
   workflow_call:
     secrets:
@@ -12,13 +12,13 @@ on:
       AWS_ACCOUNT_ID:
         required: true
 jobs:
-  terraform:
+  infra-eks:
     name: create eks cluster
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: terraform
+        working-directory: infra
 
     steps:
       - name: Checkout repo
