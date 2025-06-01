@@ -1,6 +1,9 @@
 # general vars
 region = "us-east-1"
 
+# ecr
+ecr_repository_name = "common-app"
+
 # vpc vars
 name = "eks-vpc"
 vpc_cidr_block = "10.0.0.0/16"
@@ -38,6 +41,3 @@ s3_tags = {
 bucket_acl = "private"
 versioning_enabled = true
 server_side_encryption = true
-
-# webvar vars optional if you want to deploy a webapp with tf in the future
-#enable_webapp = false

@@ -1,4 +1,4 @@
-name: k8s-wenbservice
+name: k8s-webservice
 on:
   # push:
   #   branches:

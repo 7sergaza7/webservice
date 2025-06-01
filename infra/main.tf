@@ -7,6 +7,39 @@ data "aws_caller_identity" "current" {}
 # need it to get availability zones
 data "aws_availability_zones" "available" {}
 
+# #ecr create module
+module "ecr" {
+  source = "terraform-aws-modules/ecr/aws"
+
+  repository_name = var.ecr_repository_name
+
+  repository_read_write_access_arns = [data.aws_caller_identity.current.arn]
+  repository_image_tag_mutability = "MUTABLE"
+  create_lifecycle_policy = true
+  repository_lifecycle_policy = jsonencode({
+    rules = [{
+        rulePriority = 1,
+        description  = "Keep last 30 images",
+        selection = {
+          tagStatus     = "tagged",
+          tagPrefixList = ["v"],
+          countType     = "imageCountMoreThan",
+          countNumber   = 30
+        },
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+
+  repository_force_delete = true
+  tags = {
+    Name       = var.ecr_repository_name
+  }
+}
+
+
 # VPC with AWS module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -47,7 +80,7 @@ module "s3_tfstate" {
       }
     }
   }
-
+  force_destroy = true
   tags = var.s3_tags 
 }
 

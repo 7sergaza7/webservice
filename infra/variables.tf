@@ -1,3 +1,8 @@
+variable "ecr_repository_name" {
+  description = "Name of the ECR repository"
+  type        = string
+ 
+}
 variable "tfstate_bucket_name" {
   description = "Name of the S3 bucket to store tfstate"
   type        = string
