@@ -25,6 +25,44 @@ __Important:__ AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY are required for provisi
 - **k8s** - kuberneted manifests to deploy
 - **.github** - github actions workflows
 
+
+## Architecture Diagram
+
+Web service image pulled from private ECR, running on EKS as deployment and exposed using service with AWS nwtwork load balancer
+
+```
+        +----------------------+
+        |    End Users         |
+        +----------------------+
+                  |
+                  v
+        +----------------------+
+        | AWS NLB (service)    | (web service exposed as load balancer)
+        +----------------------+
+                  |
+                  v
+        +----------------------+
+        |  Amazon EKS Cluster  | (Single Node)
+        +----------------------+
+                  |
+                  v
+        +----------------------+
+        |  Worker Node         |
+        | (EC2 Instance)       |
+        +----------------------+
+                  |
+                  v
+        +----------------------+
+        |  Web Service Pod     | (Deployment with 1 replica)
+        +----------------------+
+                  |
+                  v
+        +----------------------+
+        |  Container Image     |
+        | (Pulled from ECR)    | (private ECR, common-app:0.1.0)
+        +----------------------+
+```
+
 ## 🔧 1. Deployment flow
 
 The flow below represents CI/CD automated or manual deployment flow how to publish and expose webservice on internet using AWS network load balancer. The expected result is nginx url link that should be available to end user.
@@ -78,7 +116,6 @@ Creates:
         v
   ✅ Microservice is now deployed to EKS and running!
 ```
-
 
 ## 🔧 1. Infrastructure Provisioning
 
